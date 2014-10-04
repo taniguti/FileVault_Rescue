@@ -10,7 +10,7 @@ if [ ! -f "$PASS" ]; then echo "Not found $PASS" ; exit 1 ; fi
 CSUUID=`diskutil cs list | grep Logical | tail -1 | awk '{print $4}'`
 if [ ${CSUUID:-x} = x ];then
 	echo "Humm, this Mac may not been FileVaulted."
-	echo "Pliase check it."
+	echo "Please check it."
 	diskutil cs list
 	exit 1
 fi
