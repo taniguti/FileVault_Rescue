@@ -20,5 +20,5 @@ Preparation:
 Video: 
  http://youtu.be/U8GM4pbG0Qg
  
- Issue:
- 	Yosemite's Recovery system has changed something. The "diskutil cs revert" won't work.
+ BUG:
+ 	Error on Yosemite.
