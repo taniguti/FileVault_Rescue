@@ -3,6 +3,7 @@
 WDIR=`pwd`
 KC="${WDIR}/FileVaultMaster.keychain"
 PASS="${WDIR}/pass.txt"
+OS_VER=`sw_vers -productVersion`
 
 if [ ! -f "$KC" ];   then echo "Not found $KC"   ; exit 1 ; fi
 if [ ! -f "$PASS" ]; then echo "Not found $PASS" ; exit 1 ; fi
@@ -25,30 +26,39 @@ if [ $? -ne 0 ]; then exit 1 ; fi
 diskutil cs revert "$CSUUID" -recoveryKeychain "$KC"
 if [ $? -ne 0 ]; then exit 1 ; fi
 
-while true
-do
-	PROGRESS=`diskutil cs list | grep "Conversion Progress:" | awk '{print $3}'`
-	if [ ${PROGRESS:-X} = X ]; then
-		echo "Something wong. Abort."
-		diskutil cs list
-		break
-	fi
-	if [ $PROGRESS = "100%" ]; then
-		break
-	fi
-	echo "Conversion: $PROGRESS done."
-	sleep 10
-done
 
-diskutil cs revert "$CSUUID" -recoveryKeychain "$KC"
-if [ $? -ne 0 ]; then exit 1 ; fi
-MSG="`diskutil cs list`"
-echo "$MSG"
-if [ "$MSG" = "No CoreStorage logical volume groups found" ]; then
-	okReboot=YES
-else
-	diskutil cs list
-fi
+case $OS_VER in
+10.10 | 10.10.* )
+        okReboot=YES
+        ;;
+10.9 | 10.9.* | *)
+        while true
+        do
+	              PROGRESS=`diskutil cs list | grep "Conversion Progress:" | awk '{print $3}'`
+	              if [ ${PROGRESS:-X} = X ]; then
+		                    echo "Something wong. Abort."
+		                    diskutil cs list
+		                    break
+	              fi
+	              echo "Conversion: $PROGRESS done."
+	              if [ $PROGRESS = "100%" ]; then
+		                    break
+	              fi
+	              sleep 10
+        done
+
+        diskutil cs revert "$CSUUID" -recoveryKeychain "$KC"
+        if [ $? -ne 0 ]; then exit 1 ; fi
+
+        MSG="`diskutil cs list`"
+        echo "$MSG"
+        if [ "$MSG" = "No CoreStorage logical volume groups found" ]; then
+	              okReboot=YES
+        else
+	              diskutil cs list
+        fi
+        ;;
+esac
 
 if [ ${okReboot:-NO} = "YES" ]; then
 	echo "OK. You can reboot now."
