@@ -19,6 +19,3 @@ Preparation:
 	
 Video: 
  http://youtu.be/U8GM4pbG0Qg
- 
- BUG:
- 	Error on Yosemite.
