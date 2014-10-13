@@ -19,3 +19,7 @@ Preparation:
 	
 Video: 
  http://youtu.be/U8GM4pbG0Qg
+
+Validation:
+	OS X 10.10GM (14A379a)
+	OS X 10.9.5 (13F34)
