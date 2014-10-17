@@ -28,10 +28,7 @@ if [ $? -ne 0 ]; then exit 1 ; fi
 
 
 case $OS_VER in
-10.10 | 10.10.* )
-        okReboot=YES
-        ;;
-10.9 | 10.9.* | *)
+10.9 | 10.9.* )
         while true
         do
 	              PROGRESS=`diskutil cs list | grep "Conversion Progress:" | awk '{print $3}'`
@@ -57,6 +54,9 @@ case $OS_VER in
         else
 	              diskutil cs list
         fi
+        ;;
+* )
+        okReboot=YES
         ;;
 esac
 
