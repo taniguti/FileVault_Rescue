@@ -8,9 +8,7 @@ http://support.apple.com/kb/HT5077
 But this document describes only unlock volume. If you want to decrypt File vaulted startup disk completely, this script will help you.
 
 Condition:
-	- You must be a Mac Administrator of your organization.
-	- Managed Mac computer must be file vaulted with your FileVault Master.keychain.
-	- Of course you have to know unlock passcode of  FileVault Master.keychain.
+---
 
 Preparation:
 	Save this script with your FileVault Master.keychain which must have private key.
