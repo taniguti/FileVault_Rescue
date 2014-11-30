@@ -22,7 +22,7 @@ isRevertible=`diskutil cs list | grep Revertible | awk '{print $2}'`
 RevertibleDescription="`diskutil cs list| grep "Revertible" | tr '(' ':' | tr ')' ':' | awk -F: '{print $3}'`"
 
 if [ ${encryptionType:-unknown} = None ]; then
-   if [ "$RevertibleDescriptionr" = "no decryption required" ]; then
+   if [ "$RevertibleDescription:-X" = "no decryption required" ]; then
       sw_vers
       echo "This Mac has a coreStorage logical volume."
       echo "But the coreStorage logical volume is not encrypted."
