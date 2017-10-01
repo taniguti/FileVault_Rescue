@@ -1,6 +1,8 @@
 #!/bin/bash
 
-OS_VER=`sw_vers -productVersion`
+WDIR=`pwd`
+KEYCHAIN_FILE"${WDIR}/FileVaultMaster.keychain"
+PASS_FILE="${WDIR}/pass.txt"
 
 message(){
     TYPE=$1
@@ -9,9 +11,8 @@ message(){
 }
 
 unlock_KeyChain(){
-    WDIR=`pwd`
-    KC="${WDIR}/FileVaultMaster.keychain"
-    PASS="${WDIR}/pass.txt"
+    KC="$1"
+    PASS="$2"
 
     if [ ! -f "$KC" ];   then message ERROR "Not found $KC"   ; exit 1 ; fi
     if [ ! -f "$PASS" ]; then message ERROR "Not found $PASS" ; exit 1 ; fi
@@ -27,19 +28,27 @@ unlock_KeyChain(){
 }
 
 isEncryptCS(){
+    encryptionType=`diskutil cs list   | grep "Encryption Type"   | awk '{print $3}'`
     encryptionStatus=`diskutil cs list | grep "Encryption Status" | awk '{print $3}'`
-    encryptionType=`diskutil cs list| grep "Encryption Type" | awk '{print $3}'`
-    isRevertible=`diskutil cs list | grep Revertible | awk '{print $2}'`
+    isRevertible=`diskutil cs list     | grep Revertible          | awk '{print $2}'`
     RevertibleDescription="`diskutil cs list| grep "Revertible" | tr '(' ':' | tr ')' ':' | awk -F: '{print $3}'`"
 
     if [ ${encryptionType:-unknown} = None ]; then
-       if [ "$RevertibleDescription:-X" = "no decryption required" ]; then
+       if [ "${RevertibleDescription:-X}" = "no decryption required" ]; then
           message INFO This Mac has a coreStorage logical volume.
           message INFO But the coreStorage logical volume is not encrypted.
           message INFO Please check it.
           diskutil cs list
           exit 0
        fi
+    fi
+
+    if [ ${isRevertible:-No} = No ]; then
+        diskutil cs list
+        message ERROR I could not revert encypted volume due to limitation of recovery system.
+        message ERROR Maybe uable to unlock startup volume.
+        message ERROR Recovery System version is `sw_vers -productVersion`.
+        exit 1
     fi
 }
 
@@ -58,17 +67,40 @@ isEncryptAPFS(){
     return `diskutil ap list | awk '$NF == "role)" {print $6}'`
 }
 
+unlockCS(){
+    FILE="$1"
+    CSUUID=`diskutil cs list | grep Logical | tail -1 | awk '{print $4}'`
+
+    diskutil cs unlockVolume "$CSUUID" -recoveryKeychain "$FILE"
+
+    convertStatus=`diskutil cs list| grep "Conversion Status" | awk  '{print $3}'`
+    if [ ${convertStatus:=Null} != Complete ]; then
+        conversionDirection=`diskutil cs list| grep "Conversion Direction" | awk '{print $3}'`
+        diskutil cs list
+        message INFO File Vault conversion is now working.
+        message INFO You can not touch this volume until conversion finished.
+        message INFO Conversion Status: $convertStatus
+        message INFO Conversion Direction: ${conversionDirection:-unknown}
+    fi
+}
+
+decryptCS(){
+    :
+}
+
+unlockAPFS(){
+   devfile=$1
+   diskutil ap unlockvolume $devfile
+}
+
 decryptAPFS(){
    devfile=$1
-   diskutil
+   diskutil ap decryptVolume $devfile
 }
 
-revertAPFS(){
-   :
-}
-
-# MAIN
-sw_vers
+################################
+# M A I N
+################################
 
 # Check Kind of FileSystem
 diskutil cs list > /dev/null 2>&1
@@ -95,57 +127,37 @@ else
 fi
 
 if [ "${isCoreStorage}${isAppleFileSystem}" = "NONO" ];then
-   message INFO Unexpected File System type.
-   message INFO Maybe no need decript.
-   diskutil list
-   exit 1
+    message INFO Unexpected File System type.
+    message INFO Maybe no need decript.
+    diskutil list
+    exit 1
 fi
 
+if [ "${isCoreStorage}${isAppleFileSystem}" = "YESYES" ];then
+    message WARN There are both APFS and CoreStorage Volume.
+    message WARN Unmount volumes which is not startup disk.
+    exit 1
+fi
+
+# Unlock and decrypt
 if [ $isCoreStorage = YES ]; then
     isEncryptCS
-    unlock_KeyChain
+    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
+    unlockCS "$KEYCHAIN_FILE"
     decryptCS
-    revertCS
 fi
 
 if [ $isAppleFileSystem = YES ]; then
     target=`isEncryptAPFS`
-    unlock_KeyChain $target
-    decryptAPFS
-    revertAPFS
+    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
+    unlockAPFS $target
+    decryptAPFS $target
 fi
-
 
 exit 0
 
-if [ ${isRevertible:-No} = No ]; then
-  diskutil cs list
-  echo "\n############################################\n"
-  echo " I could not revert encypted volume due to "
-  echo " limitation of recovery system."
-  echo " This Mac's (Recovery System) OS version is..."
-  sw_vers
-  echo "\nBut I maybe uable to unlock startup volume...\n"
-  echo "\n############################################"
-fi
-
-
-convertStatus=`diskutil cs list| grep "Conversion Status" | awk  '{print $3}'`
-if [ ${convertStatus:=Null} != Complete ]; then
-  conversionDirection=`diskutil cs list| grep "Conversion Direction" | awk '{print $3}'`
-  diskutil cs list
-  echo "\n############################################\n"
-  echo " File Vault conversion is now working."
-  echo " You can not touch this volume until conversion"
-  echo " finished.\n"
-  echo " Conversion Status:      $convertStatus"
-  echo " Conversion Direction:   ${conversionDirection:-unknown} "
-  echo "\n############################################\n"
-  exit 1
-fi
 
 if [ ${encryptionStatus:-Unlocked} = Locked ]; then
-  diskutil cs unlockVolume "$CSUUID" -recoveryKeychain "$KC"
   if [ $? -ne 0 ]; then exit 1 ; fi
 else
   FVdisk=`diskutil cs list | grep Disk | grep -v disk0s2 | awk '{print $2}'`
@@ -234,7 +246,6 @@ else
 fi
 
 exit ${CODE:-1}
-
 
 # for Emacsen
 # Local Variables:
