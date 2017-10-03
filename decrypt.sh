@@ -1,7 +1,7 @@
 #!/bin/bash
 
 WDIR=`pwd`
-KEYCHAIN_FILE"${WDIR}/FileVaultMaster.keychain"
+KEYCHAIN_FILE="${WDIR}/FileVaultMaster.keychain"
 PASS_FILE="${WDIR}/pass.txt"
 
 message(){
@@ -80,7 +80,7 @@ unlockCS(){
         fi
     else
         FVdisk=`diskutil cs list | grep Disk | grep -v disk0s2 | awk '{print $2}'`
-        message INFO Volume (${FVdisk}) is already unlocked.
+        message INFO Volume \(${FVdisk}\) is already unlocked.
     fi
 
     isRevertible=`diskutil cs list | awk '$1 == "Revertible:" {print $2}'`
@@ -92,9 +92,14 @@ unlockCS(){
         message ERROR But you can copy itmes from unlocked volume to another storage.
         exit 1
     fi
+
+	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_unlocked.txt
+
 }
 
 watchConversion(){
+	sleep 10
+	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_convertion_inprogress.txt
     while true
     do
         PROGRESS=`diskutil cs list | grep "Conversion Progress:" | awk '{print $3}'`
@@ -105,6 +110,7 @@ watchConversion(){
         fi
         echo "Conversion: $PROGRESS done."
         if [ $PROGRESS = "100%" ]; then
+		diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_convertion_done.txt
             sleep 10
             break
         fi
@@ -151,6 +157,9 @@ decryptCS(){
         exit 1
     fi
 
+
+	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_reverted_1.txt
+
     case $macOSversion in
     9)
         watchConversion
@@ -162,6 +171,7 @@ decryptCS(){
             message ERROR Failed to revert storage.
             exit 1
         fi
+	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_reverted_2.txt
         askreboot
         ;;
     *)
