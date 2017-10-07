@@ -5,8 +5,8 @@ KEYCHAIN_FILE="${WDIR}/FileVaultMaster.keychain"
 PASS_FILE="${WDIR}/pass.txt"
 INFODIR="${WDIR}/diskutil_outputs"
 if [ -d "$INFODIR" ]; then
-    mkdir -p "${INFODIR}/`sw_vers -productVersion`"
     LOGDIR="${INFODIR}/`sw_vers -productVersion`"
+    mkdir -p "${LOGDIR}"
     sw_vers | awk -v T="`date +%F" "%T" "%Z`" '{print T":"$0}' >> "${LOGDIR}/sw_vers.txt"
     gatherlog=YES
 fi
