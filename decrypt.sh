@@ -3,6 +3,14 @@
 WDIR=`pwd`
 KEYCHAIN_FILE="${WDIR}/FileVaultMaster.keychain"
 PASS_FILE="${WDIR}/pass.txt"
+INFODIR="${WDIR}/diskutil_outputs"
+if [ -d "$INFODIR" ]; then
+    mkdir -p "${INFODIR}/`sw_vers -productVersion`"
+    LOGDIR="${INFODIR}/`sw_vers -productVersion`"
+    sw_vers | awk -v T="`date +%F" "%T" "%Z`" '{print T":"$0}' >> "${INFODIR}/sw_vers.txt"
+    gatherinfo=yes
+fi
+
 
 message(){
     TYPE=$1
@@ -92,14 +100,17 @@ unlockCS(){
         message ERROR But you can copy itmes from unlocked volume to another storage.
         exit 1
     fi
-
-	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_unlocked.txt
-
+    if [ ${gatherlog:-NO} = YES ]; then
+	    diskutil cs list > ${LOGDIR}/filevault_unlocked_`date +%F"-"%T"-"%Z`.txt
+    fi
 }
+
 
 watchConversion(){
 	sleep 10
-	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_convertion_inprogress.txt
+    if [ ${gatherlog:-NO} = YES ]; then
+	    diskutil cs list > ${LOGDIR}/filevault_convertion_inprogress_`date +%F"-"%T"-"%Z`.txt
+    fi
     while true
     do
         PROGRESS=`diskutil cs list | grep "Conversion Progress:" | awk '{print $3}'`
@@ -110,7 +121,9 @@ watchConversion(){
         fi
         echo "Conversion: $PROGRESS done."
         if [ $PROGRESS = "100%" ]; then
-		diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_convertion_done.txt
+            if [ ${gatherlog:-NO} = YES ]; then
+	            diskutil cs list > ${LOGDIR}/filevault_convertion_done_`date +%F"-"%T"-"%Z`.txt
+            fi
             sleep 10
             break
         fi
@@ -157,8 +170,9 @@ decryptCS(){
         exit 1
     fi
 
-
-	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_reverted_1.txt
+    if [ ${gatherlog:-NO} = YES ]; then
+        diskutil cs list > ${LOGDIR}/filevault_reverted_1st_`date +%F"-"%T"-"%Z`.txt
+    fi
 
     case $macOSversion in
     9)
@@ -171,7 +185,9 @@ decryptCS(){
             message ERROR Failed to revert storage.
             exit 1
         fi
-	diskutil cs list > /Volumes/FV_RescueKit/FileVault_Rescue/diskutil_outputs_samples/10.9/filevault_reverted_2.txt
+        if [ ${gatherlog:-NO} = YES ]; then
+            diskutil cs list > ${LOGDIR}/filevault_reverted_2nd_`date +%F"-"%T"-"%Z`.txt
+        fi
         askreboot
         ;;
     *)
