@@ -260,10 +260,12 @@ if [ $isCoreStorage = YES ]; then
 fi
 
 if [ $isAppleFileSystem = YES ]; then
-    target=`isEncryptAPFS`
-    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
-    unlockAPFS $target
-    decryptAPFS $target
+    message INFO This script would not work for File Vaulted APFS.
+    message INFO File Vaulted APFS could not decrypt with Institutional Recovery Key.
+#    target=`isEncryptAPFS`
+#    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
+#    unlockAPFS $target
+#    decryptAPFS $target
 fi
 
 exit 0
