@@ -15,15 +15,13 @@ Condition:
 
 Preparation:
 ---
-1. Save this script with your FileVault Master.keychain which must have private key.
-2. Save unlock passcode of FileVault Master.keychain in the file named "pass.txt".
-3. Keep it in safe.
+1. Save this script with your FileVault Master.keychain which must have private key in it.
+2. Save unlock passcode of FileVault Master.keychain in the file named "pass.txt". It must be a plain text file.
+3. Keep them in safe.
 	
-Validation:
+Tested OS Versions:
 ---
-* OS X 10.10GM (14A379a)
-* OS X 10.9.5 (13F34)
-* OS X 10.9 (13A603): Unlock only.
+See tested_os_version.txt
 
 Demo Video: 
 ---
