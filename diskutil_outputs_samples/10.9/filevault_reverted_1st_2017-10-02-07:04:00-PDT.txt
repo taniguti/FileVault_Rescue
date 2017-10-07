@@ -1,0 +1,36 @@
+CoreStorage logical volume groups (1 found)
+|
++-- Logical Volume Group B3D03D3B-BC32-49EA-891C-E236AF450CC6
+    =========================================================
+    Name:         MacintoshHD
+    Status:       Online
+    Size:         67859718144 B (67.9 GB)
+    Free Space:   16777216 B (16.8 MB)
+    |
+    +-< Physical Volume 9E40CB44-3CD3-4910-B3A2-91144C1DAF81
+    |   ----------------------------------------------------
+    |   Index:    0
+    |   Disk:     disk0s2
+    |   Status:   Online
+    |   Size:     67859718144 B (67.9 GB)
+    |
+    +-> Logical Volume Family 420CB4CA-AB9A-450F-926C-A872D8FA5FC7
+        ----------------------------------------------------------
+        Encryption Status:       Unlocked
+        Encryption Type:         AES-XTS
+        Conversion Status:       Converting
+        Conversion Direction:    backward
+        Has Encrypted Extents:   Yes
+        Fully Secure:            No
+        Passphrase Required:     No
+        |
+        +-> Logical Volume 1CB5738B-98E6-44F7-8A98-6339CBF908EE
+            ---------------------------------------------------
+            Disk:                  disk14
+            Status:                Online
+            Size (Total):          67524169728 B (67.5 GB)
+            Conversion Progress:   -none-
+            Revertible:            Yes (unlock and decryption required)
+            LV Name:               MacintoshHD
+            Volume Name:           MacintoshHD
+            Content Hint:          Apple_HFS
