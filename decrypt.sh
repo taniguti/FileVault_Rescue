@@ -140,7 +140,7 @@ askreboot(){
         case ${R:-n} in
         y | yes )
             macOSversion=`sw_vers -productVersion| awk -F. '{print $2}'`
-            if [ $macOSversion -lt 12 ]; then
+            if [ $macOSversion -lt 11 ]; then
                 /usr/sbin/systemsetup -setstartupdisk \
                     "`/usr/sbin/systemsetup -liststartupdisks | tail -1`"
             fi
