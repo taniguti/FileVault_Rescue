@@ -8,7 +8,7 @@ if [ -d "$INFODIR" ]; then
     mkdir -p "${INFODIR}/`sw_vers -productVersion`"
     LOGDIR="${INFODIR}/`sw_vers -productVersion`"
     sw_vers | awk -v T="`date +%F" "%T" "%Z`" '{print T":"$0}' >> "${LOGDIR}/sw_vers.txt"
-    gatherinfo=YES
+    gatherlog=YES
 fi
 
 message(){
@@ -139,7 +139,11 @@ askreboot(){
 
         case ${R:-n} in
         y | yes )
-            systemsetup -setstartupdisk "`systemsetup -liststartupdisks | tail -1`"
+            macOSversion=`sw_vers -productVersion| awk -F. '{print $2}'`
+            if [ $macOSversion -lt 12 ]; then
+                /usr/sbin/systemsetup -setstartupdisk \
+                    "`/usr/sbin/systemsetup -liststartupdisks | tail -1`"
+            fi
             sync; sync; sync; /sbin/reboot
             ;;
         n | no )
