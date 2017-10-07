@@ -2,3 +2,4 @@
 *.swp
 FileVault Master.keychain
 pass.txt
+diskutil_outputs/*
