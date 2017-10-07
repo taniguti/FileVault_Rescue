@@ -19,11 +19,9 @@ Preparation:
 2. Save unlock passcode of FileVault Master.keychain in the file named "pass.txt". It must be a plain text file.
 3. Keep them in safe.
 	
-Validation:
+Tested OS Versions:
 ---
-* OS X 10.10GM (14A379a)
-* OS X 10.9.5 (13F34)
-* OS X 10.9 (13A603): Unlock only.
+See tested_os_version.txt
 
 Demo Video: 
 ---
