@@ -18,11 +18,11 @@ Preparation:
 1. Save this script with your FileVault Master.keychain which must have private key in it.
 2. Save unlock passcode of FileVault Master.keychain in the file named "pass.txt". It must be a plain text file.
 3. Keep them in safe.
-	
+
 Tested OS Versions:
 ---
-See tested_os_version.txt
+See [tested_os_version.txt](https://github.com/taniguti/FileVault_Rescue/blob/master/tested_os_version.txt)
 
-Demo Video: 
+Demo Video:
 ---
 <http://youtu.be/U8GM4pbG0Qg>
