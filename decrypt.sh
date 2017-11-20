@@ -209,14 +209,18 @@ decryptCS(){
 }
 
 unlockAPFS(){
-   devfile=$1
-   FILE="$2"
-   diskutil ap unlockvolume $devfile -recoverykeychain "$FILE"
+    devfile=$1
+    FILE="$2"
+    diskutil ap unlockvolume $devfile -recoverykeychain "$FILE"
+    if [ $? -ne 0 ]; then
+        message ERROR "diskutil ap unlockvolume $devfile -recoverykeychain $FILE got error."
+        exit 1
+    fi
 }
 
 decryptAPFS(){
    devfile=$1
-   diskutil ap decryptVolume $devfile
+   diskutil ap decryptVolume $devfile -user xxxx
 }
 
 ################################
@@ -284,7 +288,7 @@ if [ $isAppleFileSystem = YES ]; then
     target=`isEncryptAPFS`
     unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
     unlockAPFS $target "$KEYCHAIN_FILE"
-    decryptAPFS $target
+    #decryptAPFS $target
 fi
 
 exit 0
