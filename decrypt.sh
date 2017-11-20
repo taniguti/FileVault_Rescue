@@ -57,7 +57,15 @@ isEncryptCS(){
 }
 
 isEncryptAPFS(){
-    encryptionStatus=`diskutil ap list | awk '$2 == "FileVault:" {print $3}' | grep -c "Yes"`
+    miner_ver=`sw_vers -productVersion| awk -F. '{print $3}'`
+    if [ ${miner_ver:-0} -le 1 ]; then
+        # from 10.13 to 10.13.1
+        flag="Encrypted:"
+    else
+        # 10.13.2 or later
+        flag="FileVault:"
+    fi
+    encryptionStatus=`diskutil ap list | awk -v F=$flag '$2 == F {print $3}' | grep -c "Yes"`
 
     if [ ${encryptionStatus:-0} -ne 1 ]; then
         message INFO This Mac has an AppleFileSystem volume.
@@ -202,7 +210,7 @@ decryptCS(){
 
 unlockAPFS(){
    devfile=$1
-    FILE="$2"
+   FILE="$2"
    diskutil ap unlockvolume $devfile -recoverykeychain "$FILE"
 }
 
