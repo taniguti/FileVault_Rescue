@@ -1,11 +1,12 @@
 ------------------------------------------
 - There are tested OS versions of RecoveryHD
 ------------------------------------------
-Mac OS X 10.9    13A603 OK.
-Mac OS X 10.10.5 14F27 OK.
-Mac OS X 10.11.6 15G31 OK.
-Mac OS X 10.12.1 16B2657 OK.
-Mac OS X 10.13   17A365 (HFS Plus, CoreStorage) OK.
+Mac OS X 10.9    13A603 unlock then decypt.
+Mac OS X 10.10.5 14F27 unlock then decypt.
+Mac OS X 10.11.6 15G31 unlock then decypt.
+Mac OS X 10.12.1 16B2657 unlock then decypt.
+Mac OS X 10.13   17A365 (HFS Plus, CoreStorage) unlock then decypt.
 Mac OS X 10.13   17A365 (APFS) not work at all.
 Mac OS X 10.13.1 17B25c (APFS) not work at all.
+Mac OS X 10.13.1 17B48  (APFS) unlock only.
 Mac OS X 10.13.2 17C76a (APFS) unlock only.
