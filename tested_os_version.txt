@@ -1,5 +1,5 @@
 ------------------------------------------
-- There are OS versions of RecoveryHD
+- There are tested OS versions of RecoveryHD
 ------------------------------------------
 Mac OS X 10.9    13A603
 Mac OS X 10.10.5 14F27
@@ -7,3 +7,4 @@ Mac OS X 10.11.6 15G31
 Mac OS X 10.12.1 16B2657
 Mac OS X 10.13   17A365 (HFS Plus, CoreStorage)
 Mac OS X 10.13.1 17B25c (APFS, But not work.)
+Mac OS X 10.13.2 17C76a (APFS)

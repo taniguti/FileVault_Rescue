@@ -57,7 +57,7 @@ isEncryptCS(){
 }
 
 isEncryptAPFS(){
-    encryptionStatus=`diskutil ap list | awk '$2 == "Encrypted:" {print $3}' | grep -c "Yes"`
+    encryptionStatus=`diskutil ap list | awk '$2 == "FileVault:" {print $3}' | grep -c "Yes"`
 
     if [ ${encryptionStatus:-0} -ne 1 ]; then
         message INFO This Mac has an AppleFileSystem volume.
@@ -68,7 +68,7 @@ isEncryptAPFS(){
         exit 0
     fi
 
-    return `diskutil ap list | awk '$NF == "role)" {print $6}'`
+    echo `diskutil ap list | awk '$NF == "role)" {print $6}'`
 }
 
 unlockCS(){
