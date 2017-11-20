@@ -57,7 +57,15 @@ isEncryptCS(){
 }
 
 isEncryptAPFS(){
-    encryptionStatus=`diskutil ap list | awk '$2 == "Encrypted:" {print $3}' | grep -c "Yes"`
+    miner_ver=`sw_vers -productVersion| awk -F. '{print $3}'`
+    if [ ${miner_ver:-0} -le 1 ]; then
+        # from 10.13 to 10.13.1
+        flag="Encrypted:"
+    else
+        # 10.13.2 or later
+        flag="FileVault:"
+    fi
+    encryptionStatus=`diskutil ap list | awk -v F=$flag '$2 == F {print $3}' | grep -c "Yes"`
 
     if [ ${encryptionStatus:-0} -ne 1 ]; then
         message INFO This Mac has an AppleFileSystem volume.
@@ -68,7 +76,7 @@ isEncryptAPFS(){
         exit 0
     fi
 
-    return `diskutil ap list | awk '$NF == "role)" {print $6}'`
+    echo `diskutil ap list | awk '$NF == "role)" {print $6}'`
 }
 
 unlockCS(){
@@ -201,13 +209,18 @@ decryptCS(){
 }
 
 unlockAPFS(){
-   devfile=$1
-   diskutil ap unlockvolume $devfile
+    devfile=$1
+    FILE="$2"
+    diskutil ap unlockvolume $devfile -recoverykeychain "$FILE"
+    if [ $? -ne 0 ]; then
+        message ERROR "diskutil ap unlockvolume $devfile -recoverykeychain $FILE got error."
+        exit 1
+    fi
 }
 
 decryptAPFS(){
    devfile=$1
-   diskutil ap decryptVolume $devfile
+   diskutil ap decryptVolume $devfile -user xxxx
 }
 
 ################################
@@ -260,12 +273,22 @@ if [ $isCoreStorage = YES ]; then
 fi
 
 if [ $isAppleFileSystem = YES ]; then
-    message INFO This script would not work for File Vaulted APFS.
-    message INFO File Vaulted APFS could not decrypt with Institutional Recovery Key.
-#    target=`isEncryptAPFS`
-#    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
-#    unlockAPFS $target
-#    decryptAPFS $target
+    OS_VERS=`sw_vers -productVersion`
+    case $OS_VERS in
+        '10.13' )
+            : Not work.
+            message ERROR "This version of macOS, $OS_VERS, could not decrypt with Insutitute master key."
+            message INFO "Version 10.13.1 or later of macOS is required."
+            exit 1
+        ;;
+        *)
+            : OK.
+        ;;
+    esac
+    target=`isEncryptAPFS`
+    unlock_KeyChain "$KEYCHAIN_FILE" "$PASS_FILE"
+    unlockAPFS $target "$KEYCHAIN_FILE"
+    #decryptAPFS $target
 fi
 
 exit 0
